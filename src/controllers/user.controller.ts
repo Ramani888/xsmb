@@ -19,7 +19,7 @@ export const signup = async (req: AuthorizedRequest, res: Response) => {
 
         await createUserData({ name, email, password: String(newPassword) });
 
-        res.status(StatusCodes.CREATED).json({ message: "User created successfully." });
+        res.status(StatusCodes.CREATED).json({ success: true, message: "User created successfully." });
     } catch (error) {
         console.error("Signup Error:", error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
