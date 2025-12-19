@@ -8,7 +8,7 @@ const env = process.env;
 
 export const signup = async (req: AuthorizedRequest, res: Response) => {
     try {
-        const { name, email, password } = req.body;
+        const { email, password } = req.body;
 
         const existingUser = await getUserByEmail(email);
         if (existingUser) {
@@ -17,7 +17,7 @@ export const signup = async (req: AuthorizedRequest, res: Response) => {
 
         const newPassword = await encryptPassword(password);
 
-        await createUserData({ name, email, password: String(newPassword) });
+        await createUserData({ ...req.body, email, password: String(newPassword) });
 
         res.status(StatusCodes.CREATED).json({ success: true, message: "User created successfully." });
     } catch (error) {
@@ -47,7 +47,7 @@ export const login = async (req: AuthorizedRequest, res: Response) => {
 
         const SECRET_KEY: any = env.SECRET_KEY;
         const token = jwt.sign(
-            { userId: user?._id?.toString(), name: user?.name },
+            { userId: user?._id?.toString(), shopName: user?.shopName },
             SECRET_KEY,
             { expiresIn: '30d' } // expires in 30 days
         );

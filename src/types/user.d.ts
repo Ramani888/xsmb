@@ -6,9 +6,16 @@ declare namespace Express {
 
 export interface IUser {
     _id?: string;
-    name: string;
+    shopName: string;
+    ownerName: string;
     email: string;
     password: string;
+    number: string;
+    country: string;
+    state: string;
+    city: string;
+    pincode: string;
+    address: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
