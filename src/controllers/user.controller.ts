@@ -3,12 +3,14 @@ import { Response } from 'express';
 import { AuthorizedRequest } from "../types/user";
 import { createUserData, getUserByEmail } from "../services/user.service";
 import { comparePassword, encryptPassword } from "../utils/helpers/general";
+import { createInitialPricing, generateQRCode } from "../services/pricing.service";
 import jwt from 'jsonwebtoken';
+import slugify from "slugify";
 const env = process.env;
 
 export const signup = async (req: AuthorizedRequest, res: Response) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, shopName } = req.body;
 
         const existingUser = await getUserByEmail(email);
         if (existingUser) {
@@ -17,9 +19,34 @@ export const signup = async (req: AuthorizedRequest, res: Response) => {
 
         const newPassword = await encryptPassword(password);
 
-        await createUserData({ ...req.body, email, password: String(newPassword) });
+        // Create shop link using shop name
+        const shopLink = `${env.SHOP_BASE_URL}/${slugify(shopName, { lower: true })}`;
 
-        res.status(StatusCodes.CREATED).json({ success: true, message: "User created successfully." });
+        // Generate QR code
+        const qrCode = await generateQRCode(shopLink);
+
+        // Create user with QR code and shop link
+        const userData = await createUserData({ 
+            ...req.body, 
+            email, 
+            password: String(newPassword),
+            qrCode,
+            shopLink,
+        });
+
+        // Create initial pricing for the user
+        await createInitialPricing(userData._id?.toString() || '', shopLink);
+
+        res.status(StatusCodes.CREATED).json({ 
+            success: true, 
+            message: "User created successfully.",
+            user: {
+                id: userData._id,
+                shopName: userData.shopName,
+                qrCode: userData.qrCode,
+                shopLink: userData.shopLink,
+            }
+        });
     } catch (error) {
         console.error("Signup Error:", error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });

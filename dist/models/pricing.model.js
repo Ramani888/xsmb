@@ -32,31 +32,19 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.Pricing = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const validator_1 = __importDefault(require("validator"));
 const env = process.env;
-const UserSchema = new mongoose_1.Schema({
-    shopName: { type: String, required: true },
-    ownerName: { type: String, required: true },
-    email: { type: String, required: true, unique: true, lowercase: true,
-        validate: {
-            validator: (value) => validator_1.default.isEmail(value),
-        },
-    },
-    password: { type: String, required: true },
-    number: { type: String, required: true },
-    country: { type: String, required: true },
-    state: { type: String, required: true },
-    city: { type: String, required: true },
-    pinCode: { type: String, required: true },
-    address: { type: String, required: true },
-    qrCode: { type: String }, // QR code as data URL (base64 encoded image)
-    shopLink: { type: String }, // Shop link for QR code
+const PricingSchema = new mongoose_1.Schema({
+    userId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+    bwA4: { type: Number, default: 3 }, // B/W A4 (per page) - ₹
+    colorA4: { type: Number, default: 5 }, // Color A4 (per page) - ₹
+    bwA3: { type: Number, default: 8 }, // B/W A3 (per page) - ₹
+    colorA3: { type: Number, default: 15 }, // Color A3 (per page) - ₹
+    doubleSided: { type: Number, default: 1 }, // Double-sided (additional) - ₹
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
 }, { timestamps: true });
 const dbConnection = mongoose_1.default.connection.useDb(env.DATABASE_NAME ?? '');
-exports.User = dbConnection.model('User', UserSchema, 'User');
+exports.Pricing = dbConnection.model('Pricing', PricingSchema, 'Pricing');

@@ -18,6 +18,8 @@ const UserSchema = new Schema({
     city: { type: String, required: true },
     pinCode: { type: String, required: true },
     address: { type: String, required: true },
+    qrCode: { type: String }, // QR code as data URL (base64 encoded image)
+    shopLink: { type: String }, // Shop link for QR code
 }, { timestamps: true });
 
 const dbConnection = mongoose.connection.useDb(env.DATABASE_NAME ?? '');

@@ -16,6 +16,8 @@ export interface IUser {
     city: string;
     pincode: string;
     address: string;
+    qrCode?: string;
+    shopLink?: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
