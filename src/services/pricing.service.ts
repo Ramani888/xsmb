@@ -32,7 +32,7 @@ export const getPricingByUserId = async (userId: string) => {
     }
 };
 
-export const updatePricing = async (userId: string, priceData: any) => {
+export const updatePricingByUserId = async (userId: string, priceData: any) => {
     try {
         const result = await Pricing.findOneAndUpdate(
             { userId },

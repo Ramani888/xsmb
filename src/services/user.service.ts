@@ -20,3 +20,25 @@ export const createUserData = async (data: IUser) => {
         throw err;
     }
 }
+
+export const getUserById = async (userId: string) => {
+    try {
+        const result = await User?.findById(userId);
+        return result?.toObject();
+    } catch (err) {
+        throw err;
+    }
+}
+
+export const updateUserById = async (userId: string, updateData: Partial<IUser>) => {
+    try {
+        const result = await User?.findByIdAndUpdate(
+            userId,
+            { ...updateData, updatedAt: new Date() },
+            { new: true }
+        );
+        return result?.toObject();
+    } catch (err) {
+        throw err;
+    }
+}

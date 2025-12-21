@@ -1,9 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 import { Response } from 'express';
 import { AuthorizedRequest } from "../types/user";
-import { createUserData, getUserByEmail } from "../services/user.service";
+import { createUserData, getUserByEmail, getUserById, updateUserById } from "../services/user.service";
 import { comparePassword, encryptPassword } from "../utils/helpers/general";
-import { createInitialPricing, generateQRCode } from "../services/pricing.service";
+import { createInitialPricing, generateQRCode, getPricingByUserId, updatePricingByUserId } from "../services/pricing.service";
 import jwt from 'jsonwebtoken';
 import slugify from "slugify";
 const env = process.env;
@@ -83,6 +83,41 @@ export const login = async (req: AuthorizedRequest, res: Response) => {
 
     } catch (error) {
         console.error("Login Error:", error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
+    }
+}
+
+export const getUserProfile = async (req: AuthorizedRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+
+        const user = await getUserById(userId || '');
+        const pricing = await getPricingByUserId(userId || '');
+
+        res.status(StatusCodes.OK).json({ 
+            success: true, 
+            data: {
+                ...user,
+                pricing
+            }
+        });
+    } catch (error) {
+        console.error("Get User Profile Error:", error);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
+    }
+}
+
+export const updateUserProfile = async (req: AuthorizedRequest, res: Response) => {
+    try {
+        const userId = req.user?.userId;
+        const updateData = req.body;
+        
+        const updatedUser = await updateUserById(userId || '', updateData);
+        const updatedPricing = await updatePricingByUserId(userId || '', updateData?.pricing || {});
+
+        res.status(StatusCodes.OK).json({ success: true, data: { ...updatedUser, pricing: updatedPricing }, message: "User profile updated successfully." });
+    } catch (error) {
+        console.error("Update User Profile Error:", error);
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
     }
 }

@@ -1,8 +1,7 @@
 import { StatusCodes } from "http-status-codes";
 import { Response } from 'express';
 import { AuthorizedRequest } from "../types/user";
-import { getPricingByUserId, updatePricing, generateQRCode } from "../services/pricing.service";
-import { getUserByEmail } from "../services/user.service";
+import { getPricingByUserId, updatePricingByUserId } from "../services/pricing.service";
 
 export const getPricing = async (req: AuthorizedRequest, res: Response) => {
     try {
@@ -41,7 +40,7 @@ export const updateShopPricing = async (req: AuthorizedRequest, res: Response) =
         if (colorA3 !== undefined) updateData.colorA3 = colorA3;
         if (doubleSided !== undefined) updateData.doubleSided = doubleSided;
 
-        const updatedPricing = await updatePricing(userId, updateData);
+        const updatedPricing = await updatePricingByUserId(userId, updateData);
 
         res.status(StatusCodes.OK).json({ 
             success: true, 

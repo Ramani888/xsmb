@@ -29,3 +29,21 @@ export const comparePassword = (storedPassword: string, validatePassword: string
     });
   });
 };
+
+export function authenticateToken(req: any, res: any, next: any) {
+  const token = req.header('Authorization');
+  const SECRET_KEY: any = env.SECRET_KEY;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  jwt.verify(token, SECRET_KEY, (err: any, user: any) => {
+    if (err) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    req.user = user;
+    next();
+  });
+}
